@@ -1,0 +1,36 @@
+# Ignore build output directories
+bin/
+obj/
+
+# Ignore user-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore package dependencies (NuGet)
+packages/
+
+# Ignore ASP.NET temporary files
+.vs/
+.vscode/
+
+# Ignore sensitive config files
+appsettings.json
+appsettings.Development.json
+secrets.json
+
+# Ignore log files
+*.log
+
+# Ignore publish output
+publish/
+
+# Ignore Visual Studio for Mac specific files
+.vscode/
+
+# Ignore any secrets
+*.env
+
+# Ignore test results
+TestResults/
