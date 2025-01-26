@@ -4,5 +4,9 @@ public enum OrderStatus
 {
     Pending,
     PaymentReceived,
-    PaymentFailed
+    PaymentFailed,
+    Shipped,
+    Delivered,
+    Canceled,
+    PaymentCanceled  // Add this line
 }
