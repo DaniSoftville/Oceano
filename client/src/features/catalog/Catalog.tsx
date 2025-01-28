@@ -46,6 +46,7 @@ import RadioButtonGroup from "../../app/components/RadioButtonGroup";
 import CheckboxButtons from "../../app/components/CheckboxButtons";
 import Filters from "./Filters";
 import AppPagination from "../../app/components/AppPagination";
+import useProducts from "../../app/hooks/useproducts";
 
 const VIEW_OPTIONS = [
   { value: "list", icon: <Iconify icon="carbon:list-boxes" /> },
@@ -76,17 +77,10 @@ type Props = {
 };
 export default function Catalog() {
   const mdUp = useResponsive("up", "md");
-  const products = useAppSelector(productSelectors.selectAll);
   const [viewMode, setViewMode] = useState("grid");
   const [sort, setSort] = useState("Alfhabetical");
-  const {
-    productsLoaded,
-    filtersLoaded,
-    types,
-    genres,
-    productParams,
-    metaData,
-  } = useAppSelector((state) => state.catalog);
+  const { products, filtersLoaded, genres, types, metaData } = useProducts();
+  const { productParams } = useAppSelector((state) => state.catalog);
   const dispatch = useAppDispatch();
   const mobileOpen = useBoolean();
   type Props = {
@@ -130,10 +124,6 @@ export default function Catalog() {
       ? selectedItems.filter((value) => value !== item)
       : [...selectedItems, item]; */
 
-  useEffect(() => {
-    if (!productsLoaded) dispatch(fetchProductsAsync());
-  }, [productsLoaded, dispatch]);
-
   /*  const handleChangeViewMode = useCallback(
     (event: React.MouseEvent<HTMLElement>, newAlignment: string | null) => {
       if (newAlignment !== null) {
@@ -156,10 +146,7 @@ export default function Catalog() {
     },
     [filters]
   ); */
-  useEffect(() => {
-    if (!filtersLoaded) dispatch(fetchFilters());
-  }, [dispatch, filtersLoaded]);
-
+  if (!filtersLoaded) return <LoadingComponent message="Loading products..." />;
   return (
     <>
       <Container>
