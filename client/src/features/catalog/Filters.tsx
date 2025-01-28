@@ -25,9 +25,9 @@ const BRAND_OPTIONS = [
 ];
 
 const TYPES_OPTIONS = [
-  { value: "Hat", label: "Hats" },
+  { value: "Hats", label: "Hats" },
   { value: "Gloves", label: "Gloves" },
-  { value: "Board", label: "Boards" },
+  { value: "Boards", label: "Boards" },
   { value: "Boots", label: "Boots" },
 ];
 

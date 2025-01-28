@@ -1,14 +1,12 @@
-import { MetaData } from "./../../app/models/pagination";
-import { ProductParams } from "./../../app/models/product";
 import {
   createAsyncThunk,
   createEntityAdapter,
   createSlice,
 } from "@reduxjs/toolkit";
 import agent from "../../app/api/agent";
-import { Product } from "../../app/models/product";
+import { Product, ProductParams } from "../../app/models/product";
 import { RootState } from "../../app/store/configureStore";
-
+import { MetaData } from "../../app/models/pagination";
 interface CatalogState {
   productsLoaded: boolean;
   filtersLoaded: boolean;
@@ -18,9 +16,7 @@ interface CatalogState {
   productParams: ProductParams;
   metaData: MetaData | null;
 }
-
 const productsAdapter = createEntityAdapter<Product>();
-
 function getAxiosParams(productParams: ProductParams) {
   const params = new URLSearchParams();
   params.append("pageNumber", productParams.pageNumber.toString());
@@ -28,13 +24,12 @@ function getAxiosParams(productParams: ProductParams) {
   params.append("orderBy", productParams.orderBy);
   if (productParams.searchTerm)
     params.append("searchTerm", productParams.searchTerm);
-  if (productParams.types?.length > 0)
+  if (productParams.types.length > 0)
     params.append("types", productParams.types.toString());
-  if (productParams.genres?.length > 0)
+  if (productParams.genres.length > 0)
     params.append("genres", productParams.genres.toString());
   return params;
 }
-
 export const fetchProductsAsync = createAsyncThunk<
   Product[],
   void,
@@ -70,8 +65,7 @@ export const fetchFilters = createAsyncThunk(
     }
   }
 );
-
-function initParams() {
+function initParams(): ProductParams {
   return {
     pageNumber: 1,
     pageSize: 6,
@@ -80,12 +74,10 @@ function initParams() {
     types: [],
   };
 }
-
 export const catalogSlice = createSlice({
   name: "catalog",
   initialState: productsAdapter.getInitialState<CatalogState>({
     productsLoaded: false,
-
     filtersLoaded: false,
     status: "idle",
     genres: [],
@@ -109,9 +101,16 @@ export const catalogSlice = createSlice({
     setMetaData: (state, action) => {
       state.metaData = action.payload;
     },
-
     resetProductParams: (state) => {
       state.productParams = initParams();
+    },
+    setProduct: (state, action) => {
+      productsAdapter.upsertOne(state, action.payload);
+      state.productsLoaded = false;
+    },
+    removeProduct: (state, action) => {
+      productsAdapter.removeOne(state, action.payload);
+      state.productsLoaded = false;
     },
   },
   extraReducers: (builder) => {
@@ -137,6 +136,18 @@ export const catalogSlice = createSlice({
       console.log(action);
       state.status = "idle";
     });
+    builder.addCase(fetchFilters.pending, (state) => {
+      state.status = "pendingFetchFilters";
+    });
+    builder.addCase(fetchFilters.fulfilled, (state, action) => {
+      state.genres = action.payload.genres;
+      state.types = action.payload.types;
+      state.status = "idle";
+      state.filtersLoaded = true;
+    });
+    builder.addCase(fetchFilters.rejected, (state) => {
+      state.status = "idle";
+    });
   },
 });
 
@@ -145,6 +156,8 @@ export const {
   resetProductParams,
   setMetaData,
   setPageNumber,
+  setProduct,
+  removeProduct,
 } = catalogSlice.actions;
 
 export const productSelectors = productsAdapter.getSelectors(
